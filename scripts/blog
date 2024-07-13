@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# A bash script that helps me create notes for my blog
+# by running 'blog zet' or 'blog article' a markdown file is created in the proper directory, with my chosen filename.
+
+HOSTING_REPO="$NOTES/"
+SECOND_BRAIN="$NOTES/brain"
+
+# get_filename prompts the user for a filename
+get_filename() {
+	read -p "Enter a filename: " filename
+}
+
+# open_file creates and opens a file in the specified directory
+open_file() {
+
+	date=$(date +"%Y-%m-%d")
+	timestamp="$(date +"%Y%m%d%H%m")"
+	# Cd into the directory
+	cd "$1" || exit
+	# Create the file in the specified directory
+	file="$1/$timestamp-$filename.md"
+	touch "${file}"
+
+	# cd into second brain
+	cd "$SECOND_BRAIN" || exit
+
+	# Format the title by removing dashes
+	title=$filename
+	title="${title//-/ }"
+
+	# set up the yaml frontmatter
+	echo "---" >>""${file}""
+	echo "title: $filename" >>""${file}""
+	echo "date: $date" >>""${file}""
+
+	if [[ $2 = "zet" ]]; then
+		echo "tags:" >>"${file}"
+		echo "- " >>"${file}"
+	fi
+
+	if [[ $2 = "article" ]]; then
+		echo "tags:" >>"${file}"
+		echo "- Article" >>"${file}"
+	fi
+
+	echo "---" >>"${file}"
+	echo -en "\n" >>"${file}"
+	echo -en "\n" >>"${file}"
+	echo -en "\n" >>"${file}"
+	echo "## Links:" >>"${file}"
+	echo -en "\n" >>"${file}"
+	echo "$timestamp" >>"${file}"
+
+	# Open the file in Neovim
+	nvim '+ normal 2GzzA' "${file}"
+
+}
+
+blog(){
+# Check the value of the first parameter
+case "$1" in
+zet)
+	# Call the function to get the filename
+	get_filename
+
+	# Call the function to create and open the file in the specified directory
+	open_file "${SECOND_BRAIN}/zet" "zet"
+
+	;;
+article)
+	# Call the function to get the filename
+	get_filename
+
+	# Call the function to create and open the file in the specified directory
+	open_file  "${SECOND_BRAIN}/articles" "articles"
+  ;;
+*) 
+  echo "Please use zet or article as argument"
+  ;;
+esac
+}
+
+blog $1
