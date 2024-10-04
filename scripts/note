@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Takes some note on the fly.
+
+DIR="$NOTES/"
+TITLE="${1:-scribble}"
+DATE="$(date +"%Y-%m-%d")"
+TS="$(date +"%H%M%S")"
+
+open_file() {
+
+	cd "$DIR" || exit
+	file="${DIR}/${DATE}-${TS}_${TITLE}.md"
+	touch "${file}"
+
+	# Format the title by removing dashes
+
+	title=$TITLE
+	title="${title//-/ }"
+
+	{
+		echo "---"
+		echo "title: $TITLE"
+		echo "date: $DATE"
+		echo "created-at: $TS"
+		echo "tags:"
+		echo "- Scribble"
+		echo "---"
+		echo -en "\n"
+		echo -en "\n"
+		echo -en "\n"
+		echo "## Links:"
+		echo -en "\n"
+		echo "$DATE"
+	} >>"${file}"
+
+	# Open the file in Neovim
+	nvim '+ normal 2GzzA' "${file}"
+}
+
+open_file

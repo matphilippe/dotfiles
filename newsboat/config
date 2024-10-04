@@ -1,4 +1,38 @@
-text-width 72
-browser "open -a firefox %u"
+
+# -- feeds ---------------------------------------------------------------------
+
+auto-reload yes
+reload-time 120
+reload-threads 4
+download-retries 4
+download-timeout 10
+prepopulate-query-feeds yes
 max-items 500
+
+# -- browser ------------------------------------------------------------------
+browser "open -a 'google chrome' %u"
+
+# -- display ------------------------------------------------------------------
+
+show-read-feeds no
+feed-sort-order unreadarticlecount-asc
+
+color info default default reverse
+color listnormal_unread yellow default
+color listfocus blue default reverse bold
+color listfocus_unread blue default reverse bold
+
+text-width 120
+
+#-- navigation -- 
+
+unbind-key ENTER
+unbind-key j
+unbind-key k
+unbind-key J
+unbind-key K
+bind-key j down
+bind-key k up
+bind-key l open
+bind-key h quit
 

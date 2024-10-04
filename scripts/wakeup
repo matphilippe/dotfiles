@@ -1,0 +1,14 @@
+#/bin/bash
+
+echo "Login you in to your AWS console"
+
+aws-sso-util login
+
+echo "The news sir"
+
+newsboat
+
+echo "Do you want to journal sir?"
+
+note "WakingUp"
+

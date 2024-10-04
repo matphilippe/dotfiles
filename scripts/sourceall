@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Directory containing the files
+FOLDER_PATH=$(realpath $1)
+
+# Check if the folder exists
+if [[ ! -d "$FOLDER_PATH" ]]; then
+  echo "Directory $FOLDER_PATH does not exist."
+  exit 1
+fi
+
+# Loop over all files in the folder
+for file in "$FOLDER_PATH"/*; do
+  # Ensure it's a regular file
+  if [[ -f "$file" ]]; then
+    # Source the file (execute it in the context of the current shell)
+    source "$file"
+  fi
+done

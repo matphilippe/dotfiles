@@ -6,32 +6,29 @@
 
 # create directories
 export XDG_CONFIG_HOME="$HOME"/.config
+
+mkdir -p "$HOME"/Projects
+
 mkdir -p "$XDG_CONFIG_HOME"/bash
 mkdir -p "$XDG_CONFIG_HOME"/alacritty
 mkdir -p "$XDG_CONFIG_HOME"/alacritty/themes
-mkdir -p "$XDG_CONFIG_HOME"/skhd
-mkdir -p "$XDG_CONFIG_HOME"/k9s
-# mkdir -p "$XDG_CONFIG_HOME"/wezterm
-
-# git clone https://github.com/alacritty/alacritty-theme "$XDG_CONFIG_HOME"/alacritty/themes
+mkdir -p "$XDG_CONFIG_HOME"/newsboat
+mkdir -p "$XDG_CONFIG_HOME"/wezterm
 
 # Symbolic links
 
-# ln -s ./.amethyst.yml "$HOME"/.amethyst.yml
 ln -sf "$PWD/alacritty.toml" "$XDG_CONFIG_HOME"/alacritty/alacritty.toml
-ln -sf "$PWD/k9s/skin.yml" "$XDG_CONFIG_HOME"/k9s/skin.yml
+
 ln -sf "$PWD/.bash_profile" "$HOME"/.bash_profile
 ln -sf "$PWD/.bashrc" "$HOME"/.bashrc
+
+ln -sf "$PWD/.zshrc" "$HOME"/.zshrc
+
 ln -sf "$PWD/.inputrc" "$HOME"/.inputrc
 ln -sf "$PWD/.tmux.conf" "$HOME"/.tmux.conf
 ln -sf "$PWD/nvim" "$XDG_CONFIG_HOME"/nvim
-ln -sf "$PWD/skhdrc" "$XDG_CONFIG_HOME"/skhd/skhdrc
-ln -sf "$PWD/sway" "$XDG_CONFIG_HOME/sway"
-# ln -sf "$PWD/newsboat/config" "$HOME"/.newsboat/config
-# ln -sf "$PWD/newsboat/urls" "$HOME"/.newsboat/urls
-# ln -sf "$PWD/wezterm.lua" /mnt/c/Users/PD2
+ln -sf "$PWD/newsboat/config" "$XDG_CONFIG_HOME"/newsboat/config
+ln -sf "$PWD/newsboat/urls" "$XDG_CONFIG_HOME"/newsboat/urls
+ln -sf "$PWD/starship.toml" "$XDG_CONFIG_HOME"/starship.toml
 
-# Second Brain
-export SECOND_BRAIN=("/Users/mphilippe/Projects/notes")
-ln -sf "$SECOND_BRAIN" ~/Zettelkasten
-
+ln -sf "$PWD/wezterm.lua" "$XDG_CONFIG_HOME"/wezterm/wezterm.lua

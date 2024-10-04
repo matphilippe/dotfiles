@@ -1,0 +1,93 @@
+#!/bin/bash
+
+# Function to get current time in seconds since epoch
+get_current_time() {
+	date +%s
+}
+DATE="$(date +"%Y-%m-%d")"
+TS="$(date +"%H%M%S")"
+
+convert_to_seconds() {
+	local duration=$1
+	local total_seconds=0
+
+	# Use regex to optionally capture days, hours, and minutes
+	if [[ $duration =~ ([0-9]+)d ]]; then
+		days=${BASH_REMATCH[1]}
+	fi
+	if [[ $duration =~ ([0-9]+)h ]]; then
+		hours=${BASH_REMATCH[1]}
+	fi
+	if [[ $duration =~ ([0-9]+)m ]]; then
+		minutes=${BASH_REMATCH[1]}
+	fi
+
+	# Convert the captured values to seconds
+	day_seconds=$((days * 86400))
+	hour_seconds=$((hours * 3600))
+	minute_seconds=$((minutes * 60))
+
+	# Sum the seconds
+	total_seconds=$((day_seconds + hour_seconds + minute_seconds))
+	echo $total_seconds
+}
+
+# Function to check if a node is NotReady and older than the age threshold
+is_node_eligible() {
+	local node_name=$1
+	local node_status=$2
+
+	# Debug: Print the arguments
+	echo "Checking node: $node_name, Status: $node_status,  Threshold: $threshold seconds"
+
+	# Filter nodes based on NotReady status
+	if [[ "$node_status" != "NotReady" ]]; then
+		return 1
+	fi
+
+	return 0
+}
+
+# Function to process nodes and output YAML describe to files
+process_nodes() {
+	local threshold=$1
+	local name_prefix=$2
+	local filename=""
+	kubectl get nodes --no-headers | while read -r node_line; do
+		node_name=$(echo "$node_line" | awk '{print $1}')
+		node_status=$(echo "$node_line" | awk '{print $2}')
+
+		if is_node_eligible "$node_name" "$node_status" "$node_age" "$threshold" "$current_time"; then
+			filename="${name_prefix}-${DATE}-${TS}-${node_name}"
+
+			echo "Processing node: $node_name"
+			kubectl get node "$node_name" -o json >"/tmp/${filename}.json"
+
+			lastTransitionTime=$(cat "/tmp/${filename}.json" | jq -r '.status.conditions.[] | select(.type == "Ready") | .lastTransitionTime')
+
+			echo $lastTransitionTime
+
+			currentTime=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+			lastTransitionTimeEpoch=$(date -jf "%Y-%m-%dT%H:%M:%SZ" "$lastTransitionTime" +%s)
+			currentTimeEpoch=$(date -jf "%Y-%m-%dT%H:%M:%SZ" "$currentTime" +%s)
+
+			diffSeconds=$((currentTimeEpoch - lastTransitionTimeEpoch))
+			if [ "$diffSeconds" -ge "$threshold" ]; then
+				kubectl describe node "$node_name" >"${filename}.txt"
+			else
+				rm "/tmp/${filename}"
+			fi
+		fi
+	done
+}
+
+# Main function to start the process
+main() {
+	local age_threshold=${1:-7200}
+	local name_prefix=$(kubectl config current-context)
+	process_nodes "$age_threshold" "$name_prefix"
+}
+
+# Execute the main function with command line argument
+main "$@"
